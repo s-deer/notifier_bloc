@@ -1,6 +1,8 @@
 
 Extended BLoC with ability to send notifications in separate stream
 
+![ezgif-3-be389728c9](https://github.com/s-deer/notifier_bloc/assets/43626481/aa14c740-672e-4724-9513-6ad3a5e819d5)
+
 ## Features
 - Execute side effects like navigation/toasts/notifications etc..
 - Show error messages
