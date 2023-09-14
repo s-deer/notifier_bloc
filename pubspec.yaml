@@ -1,7 +1,7 @@
 name: notifier_bloc
 description: A new Flutter package project.
 version: 0.0.1
-homepage: github
+homepage: https://github.com/s-deer/notifier_bloc
 
 environment:
   sdk: ">=3.0.3 <4.0.0"
