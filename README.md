@@ -1,39 +1,75 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+Extended BLoC with ability to send notifications in separate stream
 
 ## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+- Execute side effects like navigation/toasts/notifications etc..
+- Show error messages
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+### 1. Create Bloc 
 
 ```dart
-const like = 'sample';
+import 'dart:async';
+
+import 'package:bloc/bloc.dart';
+import 'package:notifier_bloc/notifier_bloc.dart';
+
+part 'counter_event.dart';
+part 'counter_state.dart';
+part 'counter_notification.dart';
+
+class CounterBloc extends NotifierBloc<CounterEvent, CounterState, CounterNotification> {
+  CounterBloc() : super(const CounterState(0)) {
+    on<Increment>(_onIncrement);
+    on<Decrement>(_onDecrement);
+    on<Reset>(_onReset);
+  }
+
+  FutureOr<void> _onIncrement(Increment event, Emitter<CounterState> emit) {
+    emit(CounterState(state.value + 1));
+  }
+
+  FutureOr<void> _onDecrement(Decrement event, Emitter<CounterState> emit) {
+    emit(CounterState(state.value - 1));
+    emitNotification(DecrementedNotification());
+  }
+
+  FutureOr<void> _onReset(Reset event, Emitter<CounterState> emit) {
+    emit(const CounterState(0));
+    emitNotification(ResetNotification());
+  }
+}
+
 ```
 
-## Additional information
+### 2. Emit notification
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```dart
+emitNotification(IncrementedNotification());
+```
+
+
+### 3. Listen on notifications
+
+```dart
+NotifierBlocListener<CounterBloc, CounterNotification>(
+    onNotification: (context, notification) {
+      final message = switch (notification) {
+        IncrementedNotification() => 'Counter Incremented',
+        DecrementedNotification() => 'Counter Decremented',
+        ResetNotification() => 'Counter reset completed'
+      };
+
+      final messenger = ScaffoldMessenger.of(context);
+
+      messenger.hideCurrentSnackBar();
+
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    },
+)
+```
